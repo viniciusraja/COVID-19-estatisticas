@@ -17,7 +17,8 @@ class App extends React.Component{
 
         async componentDidMount() {
             await Font.loadAsync({
-                'orbitron-regular': require('./src/assets/fonts/Orbitron-Regular.ttf')
+                'big_noodle_titling': require('./src/assets/fonts/big_noodle_titling.ttf'),
+                'big_noodle_titling_oblique': require('./src/assets/fonts/big_noodle_titling_oblique.ttf')
             });
         
             this.setState({ fontLoaded: true });

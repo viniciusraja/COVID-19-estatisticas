@@ -1,4 +1,4 @@
-import {FETCH_COVIDSTATS_PENDING, FETCH_COVIDSTATS_SUCCESS, FETCH_COVIDSTATS_ERROR} from './actions';
+import {FETCH_COVIDSTATS_PENDING, FETCH_COVIDSTATS_SUCCESS, FETCH_COVIDSTATS_ERROR} from '../actions/types';
 
 const initialState = {
     pending: false,
@@ -6,7 +6,7 @@ const initialState = {
     error: null
 }
 
-export function COVIDStatsReducer(state = initialState, action) {
+const COVIDStatsReducer=(state = initialState, action) =>{
     switch(action.type) {
         case FETCH_COVIDSTATS_PENDING: 
             return {
@@ -30,6 +30,4 @@ export function COVIDStatsReducer(state = initialState, action) {
     }
 }
 
-export const getCOVIDStats = state => state.COVIDStats;
-export const getCOVIDStatsPending = state => state.pending;
-export const getCOVIDStatsError = state => state.error;
+export default (COVIDStatsReducer)

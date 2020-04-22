@@ -1,19 +1,14 @@
-import './types'
+import {FETCH_COVIDSTATS_PENDING, FETCH_COVIDSTATS_SUCCESS, FETCH_COVIDSTATS_ERROR} from './types'
 import api from '../../../services/api'
 
-function fetchCOVIDStats() {
+function fetchCOVIDStats(country,caseStatus) {
     return dispatch => {
         dispatch(fetchCOVIDStatsPending());
 
         api
-        .get('total/country/south-africa/status/confirmed?from=2020-03-01T00:00:00Z&to=2020-04-01T00:00:00Z')
-        .then(res => res.json())
+        .get(`countries/${country}`)
         .then(res => {
-            if(res.error) {
-                throw(res.error);
-            }
-            dispatch(fetchCOVIDStatsSuccess(res.COVIDStats))
-            return res.COVIDStats;
+            dispatch(fetchCOVIDStatsSuccess(res.data))
         })
         .catch(error => {
             dispatch(fetchCOVIDStatsError(error));

@@ -1,12 +1,12 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
-import playerReducer from '../reducers/playerReducer';
+import COVIDStatsReducer from '../reducers/statsReducer';
 import thunk from 'redux-thunk';
 
 const rootReducer = combineReducers({
-  playerReducer,
+  COVIDStatsReducer,
 });
 
 const configureStore = () =>
-  createStore(rootReducer, initialState, applyMiddleware(thunk));
+  createStore(rootReducer, applyMiddleware(thunk));
 
 export default configureStore;
