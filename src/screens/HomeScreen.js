@@ -1,11 +1,17 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { Component } from 'react';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  TextInput,
+} from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import fetchCOVIDStats from '../store/ducks/actions/covidStats';
-import { LinearGradient } from "expo-linear-gradient";
 
-import LogoSvg from '../components/logoSvg'
+import LogoSvg from '../components/logoSvg';
+import fetchCOVIDStats from '../store/ducks/actions/covidStats';
 class HomeScreen extends Component {
   constructor(props) {
     super(props);
@@ -31,19 +37,32 @@ class HomeScreen extends Component {
 
     return (
       <LinearGradient
-        colors={['#fff','#f5f5f5','#B7FDF0']}
+        colors={['#fff', '#f5f5f5', '#B7FDF0']}
         start={[0, 0]}
         end={[0, 0.5]}
-        style={{ flex: 1 }}
-      >
-      <View style={styles.container}>
-        {console.log(error)}
-        {error && <Text className="product-list-error">Houve error</Text>}
-        <View style={styles.recoveredContainer}>
-        <Text style={styles.recoveredTitle}>RECUPERADOS</Text>
-        <Text style={styles.recoveredNumber}>{COVIDStats.recovered}</Text>
+        style={{ flex: 1 }}>
+        <View style={styles.container}>
+          {console.log(error)}
+          {error && <Text className="product-list-error">Houve error</Text>}
+          <LogoSvg />
+          <TextInput
+            style={styles.inputSearchCountry}
+            keyboardType={'default'}
+            placeholder="Digite a Dica para sua Equipe"
+            placeholderTextColor="grey"
+            onChangeText={(country) => this.setState({ country })}
+            maxLength={15}
+            onEndEditing={() => {
+              this.props.add({
+                roundNumber: this.props.roundNumber,
+              });
+            }}
+          />
+          <View style={styles.recoveredContainer}>
+            <Text style={styles.recoveredTitle}>CURADOS</Text>
+            <Text style={styles.recoveredNumber}>{COVIDStats.recovered}</Text>
+          </View>
         </View>
-      </View>
       </LinearGradient>
     );
   }
@@ -52,23 +71,38 @@ class HomeScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems:'center',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+  },
+  inputSearchCountry: {
+    height: 30,
+    width: '90%',
+    textAlign:'center',
     justifyContent:'center',
-  },
-  recoveredContainer:{
     alignItems:'center',
-    justifyContent:'center',
+    borderRadius:20,
+    backgroundColor:'#F5F5F5',
+    elevation:7
   },
-  recoveredTitle:{
-    fontFamily:'big_noodle_titling',
-    fontSize:60
+  recoveredContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  recoveredNumber:{
-    fontFamily:'big_noodle_titling',
-    fontSize:120,
-    color:'#dfdfdf',
-    elevation:30
-
+  recoveredTitle: {
+    position:'relative',
+    top:'30',
+    fontFamily: 'big_noodle_titling',
+    fontSize: 50,
+    color: '#75B3A9',
+  },
+  recoveredNumber: {
+    backgroundColor:'red',
+    fontFamily: 'big_noodle_titling',
+    fontSize: 120,
+    color: '#FFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
   },
 });
 
@@ -81,7 +115,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {
-      fetchCOVIDStats: fetchCOVIDStats,
+      fetchCOVIDStats,
     },
     dispatch
   );
