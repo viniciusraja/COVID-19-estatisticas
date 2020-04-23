@@ -3,7 +3,7 @@ import {FETCH_COVIDSTATS_PENDING, FETCH_COVIDSTATS_SUCCESS, FETCH_COVIDSTATS_ERR
 const initialState = {
     pending: false,
     COVIDStats: [],
-    error: null
+    error: false
 }
 
 const COVIDStatsReducer=(state = initialState, action) =>{
@@ -17,6 +17,7 @@ const COVIDStatsReducer=(state = initialState, action) =>{
             return {
                 ...state,
                 pending: false,
+                error:false,
                 COVIDStats: action.payload
             }
         case FETCH_COVIDSTATS_ERROR:

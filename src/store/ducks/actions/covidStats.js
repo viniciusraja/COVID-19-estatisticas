@@ -1,12 +1,12 @@
 import {FETCH_COVIDSTATS_PENDING, FETCH_COVIDSTATS_SUCCESS, FETCH_COVIDSTATS_ERROR} from './types'
 import api from '../../../services/api'
 
-function fetchCOVIDStats(country,caseStatus) {
+function fetchCOVIDStats(req) {
     return dispatch => {
         dispatch(fetchCOVIDStatsPending());
 
         api
-        .get(`countries/${country}`)
+        .get(req)
         .then(res => {
             dispatch(fetchCOVIDStatsSuccess(res.data))
         })
