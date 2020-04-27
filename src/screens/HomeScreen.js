@@ -6,42 +6,73 @@ import {
   ActivityIndicator,
   StyleSheet,
   TextInput,
+  TouchableOpacity,
+  Keyboard
 } from 'react-native';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import Autocomplete from 'react-native-autocomplete-input';
 
+import countriesDataPt from '../store/data/countriesDataPt.json'
 import LogoSvg from '../components/LogoSvg/logoSvg';
 import MoreStatsSwipeCard from '../components/MoreStatsSwipeCard';
 import fetchCOVIDStats from '../store/ducks/actions/covidStats';
+import getSpecificCountryStats from '../store/ducks/actions/countryStats';
 import Constants from '../config/constants/Constants';
 
 class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      country: '',
+      stats: '',
+      allCountriesStats: [this.props.COVIDStatsTranslated ],
+      query: '',
+      countriesDataPt:[...countriesDataPt]
     };
     this.shouldComponentRender = this.shouldComponentRender.bind(this);
   }
-
-  componentDidMount() {
-    this.props.fetchCOVIDStats('all');
+  componentDidMount=()=>{
+     this.props.fetchCOVIDStats(`countries/`)
+    
   }
-
-  getCountryStatsFromApi=()=> {
-    this.props.fetchCOVIDStats(`countries/${this.state.country}`);
+  //this.props.fetchCOVIDStats('all');
+  
+translateCountriesNames=()=>{
+    const COVIDStatsTranslated =[]
+    for (let englishIndex = 0; englishIndex < this.props.COVIDStats.length; englishIndex++) {
+      for (let translatedIndex = 0; translatedIndex < countriesDataPt.length; translatedIndex++) {
+      if (this.props.COVIDStats[englishIndex].countryInfo._id==countriesDataPt[translatedIndex].id) {
+        return
+      }
+    }} 
   }
-
-
-  shouldComponentRender() {
-    const { pending } = this.props;
-    if (this.pending === false) return false;
-    // more tests
-    return true;
-  }
-
-  render() {
-    const { COVIDStats, error, pending } = this.props;
+  
+  
+    shouldComponentRender() {
+      const { pending } = this.props;
+      if (pending === false) return false;
+      
+      return true;
+    }
+    
+    findFilm(query) {
+    if (query === '') {
+      return [];
+    }
+    
+    const {allCountriesStats} = this.state;
+    const regex = new RegExp(`${query.trim()}`, 'i');
+    
+    return allCountriesStats.filter(
+      (country) => {
+        return country.country.search(regex) >= 0}
+      );
+    }
+    
+    render() {
+      const { COVIDStats, error, pending } = this.props;
+      const { query } = this.state;
+    const countries = this.findFilm(query);
+    const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
 
     if (!this.shouldComponentRender()) return <ActivityIndicator />;
 
@@ -52,22 +83,58 @@ class HomeScreen extends Component {
         end={[0, 0.5]}
         style={{ flex: 1 }}>
         <View style={styles.container}>
-          {error && <Text className="product-list-error">Houve error</Text>}
+          {error && (
+            <Text className="product-list-error">
+              Houve error {console.log(error)}
+            </Text>
+          )}
+
           <View style={styles.logoAndInputAndRecoveredContainer}>
             <LogoSvg style={styles.logo} />
-            <TextInput
-              style={styles.inputSearchCountry}
-              placeholder="BUSCAR PAÍS"
-              placeholderTextColor="grey"
-              onChangeText={(country) => this.setState({ country })}
-              maxLength={15}
-              onEndEditing={() =>
-                this.getCountryStatsFromApi(this.state.country)
+            <View style={styles.autoCompleteContainerToFixPosition}>
+            <Autocomplete
+              onTouchEnd={()=>this.setState({ allCountriesStats:this.props.COVIDStatsTranslated })}
+              style={styles.inputSearchCountryContainer}
+              autoCapitalize="none"
+              autoCorrect={false}
+              inputContainerStyle={styles.inputContainerStyle}
+              containerStyle={styles.containerStyle}
+              listContainerStyle={styles.listContainerStyle}
+              listStyle={styles.listStyle}
+              data={
+                countries.length === 1 && comp(query, countries[0].country)
+                  ? []
+                  : countries
               }
-            />
-            <View style={styles.recoveredContainer}>
+              defaultValue={query}
+              onChangeText={(text) => this.setState({ query: text })}
+              keyExtractor={(item) => `${item.countryInfo._id}`}
+              placeholder="Enter Star Wars country title"
+              renderItem={({ item, index }) => {
+                if(index<5){
+                return <TouchableOpacity
+                  onPress={() =>{
+                    this.setState({ query: item.country}),
+                    this.props.getSpecificCountryStats(item),
+                    Keyboard.dismiss()
+                  }
+                  }>
+                    <View style={styles.inputSearchCountryItemContainer}>
+                  <Text style={styles.inputSearchCountryText}>
+                    {item.country}{console.log(index)}
+                  </Text>
+                    </View>
+                </TouchableOpacity>}
+                return null
+              }}
+            /></View>
+            <View
+              style={styles.recoveredContainer}
+              >
               <Text style={styles.recoveredTitle}>CURADOS</Text>
-              <Text style={styles.recoveredNumber}>{COVIDStats.recovered}</Text>
+              <Text style={styles.recoveredNumber}>
+                {this.props.CountryStats.recovered}
+              </Text>
             </View>
           </View>
           <View style={styles.moreStatsContainer}>
@@ -82,28 +149,63 @@ class HomeScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width:"100%",
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  logo: {},
+  autoCompleteContainerToFixPosition: {
+    position:'absolute',
+    top:115,
+    zIndex:30,
+  },
   logoAndInputAndRecoveredContainer: {
-    marginTop: 25,
     width: '100%',
-    height: '70%',
+    marginTop:50,
+    height:370,
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  inputSearchCountry: {
-    fontFamily: 'big_noodle_titling_oblique',
-    fontSize: 20,
+  inputSearchCountryContainer: {
     height: 30,
-    width: '90%',
-    textAlign: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width:'100%',
     borderRadius: 20,
     backgroundColor: '#F5F5F5',
     elevation: 7,
+    fontFamily: 'big_noodle_titling_oblique',
+    textAlign:'center',
+  },
+  inputContainerStyle:{
+  marginTop:10,
+    height: 29,
+    width:280,
+    borderWidth:0,
+    borderRadius: 20,
+    
+  },
+  containerStyle:{
+  },
+  listContainerStyle:{
+    justifyContent:'center',
+    alignItems:'center',
+    
+  },
+  listStyle:{
+    height:200,
+    backgroundColor: 'transparent',
+    borderWidth:0,
+    marginTop:2,
+    width:'100%',
+  },
+  inputSearchCountryItemContainer:{
+    height:25,
+    backgroundColor: '#F5F5F5',
+    borderRadius:20,
+    marginVertical:2,
+  },
+  inputSearchCountryText: {
+    fontFamily: 'big_noodle_titling_oblique',
+    fontSize: 20,
+    textAlign: 'center',
   },
   recoveredContainer: {
     alignItems: 'center',
@@ -132,16 +234,17 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => ({
   error: state.COVIDStatsReducer.error,
+  CountryStats: state.COVIDStatsReducer.CountryStats,
   COVIDStats: state.COVIDStatsReducer.COVIDStats,
+  COVIDStatsTranslated: state.COVIDStatsReducer.COVIDStatsTranslated,
   pending: state.COVIDStatsReducer.pending,
 });
 
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators(
-    {
-      fetchCOVIDStats,
-    },
-    dispatch
-  );
+const mapDispatchToProps = (dispatch) =>{
+  return {
+    fetchCOVIDStats: req => dispatch(fetchCOVIDStats(req)),
+    getSpecificCountryStats: stats => dispatch(getSpecificCountryStats(stats))
+  }
+  }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

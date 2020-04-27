@@ -17,59 +17,90 @@ export const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     elevation: 7,
   },
+  countryNameAndStatsContainer:{
+    flexDirection:'row',
+    height:'100%',
+    width:'100%',
+    justifyContent:'space-around',
+    alignItems:'flex-end',
+  },
+  countryNameText:{
+    fontFamily:Constants.fontFamily,
+    fontSize:60,
+    color:Constants.Colors.green,
+    textAlign:'center'
+       
+  },
+  allStatsContainer:{
+    justifyContent:"flex-end",
+    alignItems:'flex-end',
+    height:'100%',
+    width:'70%'
+  },
   moreStatsTitle: {
-    fontFamily: 'big_noodle_titling',
+    width:'143%',
+    textAlign:'center',
+    justifyContent:'center',
+    alignItems:'center',
+    fontFamily: Constants.fontFamily,
     fontSize: 20,
     color: Constants.Colors.green,
-    alignSelf:'center',
-    position:'absolute'
+    position:'absolute',
+    top:0
+    
   },
   confirmedCasesContainer: {
       width:'50%',
       justifyContent:'center',
     alignItems:'flex-end',
     marginRight:35,
-    borderColor:'red',
-    borderRightWidth:1
+    borderColor:Constants.Colors.confirmed,
+    borderRightWidth:4
   },
   testedCasesContainer: {
       width:'50%',
       justifyContent:'center',
     alignItems:'flex-end',
     marginRight:35,
-    borderColor:'blue',
-    borderRightWidth:1
+    borderColor:Constants.Colors.tested,
+    borderRightWidth:4
   },
   deathsCasesContainer: {
       width:'50%',
       justifyContent:'center',
     alignItems:'flex-end',
     marginRight:35,
-    borderColor:'green',
-    borderRightWidth:1
+    borderColor:Constants.Colors.deaths,
+    borderRightWidth:4
   },
   confirmedCasesTitle: {
-    fontFamily: 'big_noodle_titling',
+    fontFamily: Constants.fontFamily,
     fontSize: 20,
+    color:Constants.Colors.confirmed,
   },
   testedCasesTitle: {
-    fontFamily: 'big_noodle_titling',
+    fontFamily: Constants.fontFamily,
     fontSize: 20,
+    color:Constants.Colors.tested,
   },
   deathsCasesTitle: {
-    fontFamily: 'big_noodle_titling',
+    fontFamily: Constants.fontFamily,
     fontSize: 20,
+    color:Constants.Colors.deaths
   },
   confirmedCasesNumber: {
-    fontFamily: 'big_noodle_titling',
+    fontFamily: Constants.fontFamily,
     fontSize: 40,
+    color:Constants.Colors.confirmed,
   },
   testedCasesNumber: {
-    fontFamily: 'big_noodle_titling',
+    fontFamily: Constants.fontFamily,
     fontSize: 40,
+    color:Constants.Colors.tested,
   },
   deathsCasesNumber: {
-    fontFamily: 'big_noodle_titling',
+    fontFamily: Constants.fontFamily,
     fontSize: 40,
+    color:Constants.Colors.deaths
   },
 });

@@ -1,44 +1,55 @@
-import {FETCH_COVIDSTATS_PENDING, FETCH_COVIDSTATS_SUCCESS, FETCH_COVIDSTATS_ERROR} from './types'
-import api from '../../../services/api'
+import {
+  FETCH_COVIDSTATS_PENDING,
+  FETCH_COVIDSTATS_SUCCESS,
+  FETCH_COVIDSTATS_ERROR,
+  TRANSLATE_COVIDSTATS_COUNTRY_NAME,
+} from '../actions/types';
+import api from '../../../services/api';
 
-function fetchCOVIDStats(req) {
-    return dispatch => {
-        dispatch(fetchCOVIDStatsPending());
-
-        api
-        .get(req)
-        .then(res => {
-            dispatch(fetchCOVIDStatsSuccess(res.data))
-        })
-        .catch(error => {
-            dispatch(fetchCOVIDStatsError(error));
-        })
-    }
+export default function fetchCOVIDStats(req) {
+  return (dispatch, getState) => {
+    dispatch(fetchCOVIDStatsPending())
+    
+    api
+    .get(req)
+    .then((res) => {
+      dispatch(fetchCOVIDStatsTranslated(res.data))
+    })
+    .catch((error) => {
+      dispatch(fetchCOVIDStatsError(error));
+    })
+  }
 }
 
-export default fetchCOVIDStats;
 
-
-
-
+ function getCOVIDStatsTranslated(req) {
+  return (dispatch, getState) => {
+    dispatch(fetchCOVIDStatsTranslated())
+  }
+}
 function fetchCOVIDStatsPending() {
-    return {
-        type: FETCH_COVIDSTATS_PENDING
-    }
+  return {
+    type: FETCH_COVIDSTATS_PENDING,
+  };
 }
 
 function fetchCOVIDStatsSuccess(COVIDStats) {
-    return {
-        type: FETCH_COVIDSTATS_SUCCESS,
-        payload:{...COVIDStats}
-    }
+  return {
+    type: FETCH_COVIDSTATS_SUCCESS,
+    payload: COVIDStats
+  };
 }
 
 function fetchCOVIDStatsError(error) {
-    return {
-        type: FETCH_COVIDSTATS_ERROR,
-        payload: {error}
-    }
+  return {
+    type: FETCH_COVIDSTATS_ERROR,
+    payload: { error },
+  };
 }
 
-
+function fetchCOVIDStatsTranslated(COVIDStats) {
+  return {
+    type: TRANSLATE_COVIDSTATS_COUNTRY_NAME,
+    payload: COVIDStats,
+  };
+}
