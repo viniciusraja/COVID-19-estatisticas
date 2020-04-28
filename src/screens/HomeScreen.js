@@ -7,7 +7,8 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Keyboard
+  Keyboard,
+  Image
 } from 'react-native';
 import { connect } from 'react-redux';
 import Autocomplete from 'react-native-autocomplete-input';
@@ -16,41 +17,31 @@ import countriesDataPt from '../store/data/countriesDataPt.json'
 import LogoSvg from '../components/LogoSvg/logoSvg';
 import MoreStatsSwipeCard from '../components/MoreStatsSwipeCard';
 import fetchCOVIDStats from '../store/ducks/actions/covidStats';
-import getSpecificCountryStats from '../store/ducks/actions/countryStats';
+import getDisplayedStats from '../store/ducks/actions/displayedStats';
 import Constants from '../config/constants/Constants';
+import COVIDStatsReducer from '../store/ducks/reducers/statsReducer';
 
 class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      stats: '',
+      stats:'',
       allCountriesStats: [this.props.COVIDStatsTranslated ],
       query: '',
       countriesDataPt:[...countriesDataPt]
     };
     this.shouldComponentRender = this.shouldComponentRender.bind(this);
   }
-  componentDidMount=()=>{
-     this.props.fetchCOVIDStats(`countries/`)
+  componentDidMount= async ()=>{
+    await this.props.fetchCOVIDStats('all')
+     await this.props.fetchCOVIDStats('countries/')
+    }
     
-  }
-  //this.props.fetchCOVIDStats('all');
-  
-translateCountriesNames=()=>{
-    const COVIDStatsTranslated =[]
-    for (let englishIndex = 0; englishIndex < this.props.COVIDStats.length; englishIndex++) {
-      for (let translatedIndex = 0; translatedIndex < countriesDataPt.length; translatedIndex++) {
-      if (this.props.COVIDStats[englishIndex].countryInfo._id==countriesDataPt[translatedIndex].id) {
-        return
+      shouldComponentRender() {
+        const { pending } = this.props;
+        if (pending === false) {
+          return false;
       }
-    }} 
-  }
-  
-  
-    shouldComponentRender() {
-      const { pending } = this.props;
-      if (pending === false) return false;
-      
       return true;
     }
     
@@ -74,7 +65,7 @@ translateCountriesNames=()=>{
     const countries = this.findFilm(query);
     const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
 
-    if (!this.shouldComponentRender()) return <ActivityIndicator />;
+    if (this.shouldComponentRender()) return <ActivityIndicator />;
 
     return (
       <LinearGradient
@@ -88,15 +79,17 @@ translateCountriesNames=()=>{
               Houve error {console.log(error)}
             </Text>
           )}
-
+{console.log(this.props.DisplayedStats)}
           <View style={styles.logoAndInputAndRecoveredContainer}>
             <LogoSvg style={styles.logo} />
             <View style={styles.autoCompleteContainerToFixPosition}>
             <Autocomplete
+              onPress={()=>this.myTextInput.current.clear()}
               onTouchEnd={()=>this.setState({ allCountriesStats:this.props.COVIDStatsTranslated })}
               style={styles.inputSearchCountryContainer}
               autoCapitalize="none"
               autoCorrect={false}
+              clearButtonMode="always"
               inputContainerStyle={styles.inputContainerStyle}
               containerStyle={styles.containerStyle}
               listContainerStyle={styles.listContainerStyle}
@@ -115,13 +108,19 @@ translateCountriesNames=()=>{
                 return <TouchableOpacity
                   onPress={() =>{
                     this.setState({ query: item.country}),
-                    this.props.getSpecificCountryStats(item),
+                    this.props.getDisplayedStats(item),
                     Keyboard.dismiss()
                   }
                   }>
                     <View style={styles.inputSearchCountryItemContainer}>
+                    <Image
+        style={styles.inputSearchCountryFlagImage}
+        source={{
+          uri: item.countryInfo.flag,
+        }}
+      />
                   <Text style={styles.inputSearchCountryText}>
-                    {item.country}{console.log(index)}
+                    {item.country}{console.log(item.countryInfo)}
                   </Text>
                     </View>
                 </TouchableOpacity>}
@@ -133,7 +132,7 @@ translateCountriesNames=()=>{
               >
               <Text style={styles.recoveredTitle}>CURADOS</Text>
               <Text style={styles.recoveredNumber}>
-                {this.props.CountryStats.recovered}
+                {this.props.DisplayedStats.recovered}
               </Text>
             </View>
           </View>
@@ -171,11 +170,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#F5F5F5',
     elevation: 7,
-    fontFamily: 'big_noodle_titling_oblique',
+    fontFamily: Constants.fontFamily,
+    fontSize:17,
     textAlign:'center',
   },
   inputContainerStyle:{
-  marginTop:10,
+    marginTop:10,
     height: 29,
     width:280,
     borderWidth:0,
@@ -197,10 +197,19 @@ const styles = StyleSheet.create({
     width:'100%',
   },
   inputSearchCountryItemContainer:{
+    flexDirection:'row',
+    justifyContent:'center',
+    alignItems:'center',
     height:25,
     backgroundColor: '#F5F5F5',
     borderRadius:20,
     marginVertical:2,
+  },
+  inputSearchCountryFlagImage:{
+    height:20,
+    width:30,
+    borderRadius:7,
+    marginRight:20,
   },
   inputSearchCountryText: {
     fontFamily: 'big_noodle_titling_oblique',
@@ -234,7 +243,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => ({
   error: state.COVIDStatsReducer.error,
-  CountryStats: state.COVIDStatsReducer.CountryStats,
+  DisplayedStats: state.COVIDStatsReducer.DisplayedStats,
   COVIDStats: state.COVIDStatsReducer.COVIDStats,
   COVIDStatsTranslated: state.COVIDStatsReducer.COVIDStatsTranslated,
   pending: state.COVIDStatsReducer.pending,
@@ -243,7 +252,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) =>{
   return {
     fetchCOVIDStats: req => dispatch(fetchCOVIDStats(req)),
-    getSpecificCountryStats: stats => dispatch(getSpecificCountryStats(stats))
+    getDisplayedStats: stats => dispatch(getDisplayedStats(stats))
   }
   }
 

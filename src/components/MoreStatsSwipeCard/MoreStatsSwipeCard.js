@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Animated, Text } from 'react-native';
+import { View, Animated, Text, Image } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { styles } from './styles';
 
@@ -16,24 +16,24 @@ function GetThePercentualValueFromTotal(value, total) {
 }
 function MoreStatsSwipeCard() {
   const COVIDStats = useSelector((state) => state.COVIDStatsReducer.COVIDStats);
-  const CountryStats = useSelector(
-    (state) => state.COVIDStatsReducer.CountryStats
+  const DisplayedStats = useSelector(
+    (state) => state.COVIDStatsReducer.DisplayedStats
   );
   const totalStatsNumberFromMoreStats = GetTotalSumOfEachElementInArray([
-    CountryStats.cases,
-    CountryStats.tests,
-    CountryStats.deaths,
+    DisplayedStats.cases,
+    DisplayedStats.tests,
+    DisplayedStats.deaths,
   ]);
   const widthConfirmedCasesContainer = GetThePercentualValueFromTotal(
-    CountryStats.cases,
+    DisplayedStats.cases,
     totalStatsNumberFromMoreStats
   );
   const widthTestedCasesContainer = GetThePercentualValueFromTotal(
-    CountryStats.tests,
+    DisplayedStats.tests,
     totalStatsNumberFromMoreStats
   );
   const widthDeathsCasesContainer = GetThePercentualValueFromTotal(
-    CountryStats.deaths,
+    DisplayedStats.deaths,
     totalStatsNumberFromMoreStats
   );
   const translateY = new Animated.Value(0);
@@ -80,7 +80,6 @@ function MoreStatsSwipeCard() {
   
   return (
     <View style={styles.container}>
-      {console.log(CountryStats)}
       <PanGestureHandler
         onGestureEvent={animatedEvent}
         onHandlerStateChange={onHandlerStateChanged}>
@@ -105,18 +104,30 @@ function MoreStatsSwipeCard() {
               }),
             },
           ]}>
+            
           <View style={styles.countryNameAndStatsContainer}>
-            <View style={{ justifyContent:'center', alignItems:'center',width: '30%', height: 200 }}>
+            <View style={{ justifyContent:'center', alignItems:'center',width: '40%', height: 350, marginLeft:15, marginBottom:15 }}>
+            {DisplayedStats.countryInfo.flag&&<Image
+        style={[styles.countryFlagImage,{
+          transform: [
+            { rotate: '-90deg' },
+            
+          ]}]}
+        source={{
+          uri: DisplayedStats.countryInfo.flag,
+        }}
+                />}
               <Text
                 style={[styles.countryNameText,{
                   transform: [
                     { rotate: '-90deg' },
                     
                   ],
-                  width: 200,
-                  height: '30%',
+                  width: 350,
+                  height: '40%',
                 }]}>
-                {CountryStats.country}
+                  {console.log(DisplayedStats)}
+                {DisplayedStats.country}
               </Text>
             </View>
             <View style={styles.allStatsContainer}>
@@ -145,7 +156,7 @@ function MoreStatsSwipeCard() {
                 ]}>
                 <Text style={styles.confirmedCasesTitle}>CONFIRMADOS</Text>
                 <Text style={styles.confirmedCasesNumber}>
-                  {CountryStats.cases}
+                  {DisplayedStats.cases}
                 </Text>
               </Animated.View>
               <View
@@ -155,7 +166,7 @@ function MoreStatsSwipeCard() {
                 ]}>
                 <Text style={styles.testedCasesTitle}>TESTES</Text>
                 <Text style={styles.testedCasesNumber}>
-                  {CountryStats.tests}
+                  {DisplayedStats.tests}
                 </Text>
               </View>
               <View
@@ -165,7 +176,7 @@ function MoreStatsSwipeCard() {
                 ]}>
                 <Text style={styles.deathsCasesTitle}>MORTES</Text>
                 <Text style={styles.deathsCasesNumber}>
-                  {CountryStats.deaths}
+                  {DisplayedStats.deaths}
                 </Text>
               </View>
             </View>

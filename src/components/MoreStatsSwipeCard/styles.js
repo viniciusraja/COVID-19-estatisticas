@@ -24,9 +24,18 @@ export const styles = StyleSheet.create({
     justifyContent:'space-around',
     alignItems:'flex-end',
   },
+  countryFlagImage:{
+    position:'absolute',
+    bottom:3,
+    left:-2,
+    height:30,
+    width:40,
+    borderRadius:7,
+  },
   countryNameText:{
+    marginBottom:40,
     fontFamily:Constants.fontFamily,
-    fontSize:60,
+    fontSize:50,
     color:Constants.Colors.green,
     textAlign:'center'
        
@@ -35,10 +44,10 @@ export const styles = StyleSheet.create({
     justifyContent:"flex-end",
     alignItems:'flex-end',
     height:'100%',
-    width:'70%'
+    width:'60%'
   },
   moreStatsTitle: {
-    width:'143%',
+    width:'180%',
     textAlign:'center',
     justifyContent:'center',
     alignItems:'center',
@@ -50,7 +59,7 @@ export const styles = StyleSheet.create({
     
   },
   confirmedCasesContainer: {
-      width:'50%',
+      width:'100%',
       justifyContent:'center',
     alignItems:'flex-end',
     marginRight:35,
@@ -58,7 +67,7 @@ export const styles = StyleSheet.create({
     borderRightWidth:4
   },
   testedCasesContainer: {
-      width:'50%',
+      width:'100%',
       justifyContent:'center',
     alignItems:'flex-end',
     marginRight:35,
@@ -66,7 +75,7 @@ export const styles = StyleSheet.create({
     borderRightWidth:4
   },
   deathsCasesContainer: {
-      width:'50%',
+      width:'100%',
       justifyContent:'center',
     alignItems:'flex-end',
     marginRight:35,

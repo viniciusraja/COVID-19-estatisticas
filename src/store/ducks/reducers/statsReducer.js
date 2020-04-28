@@ -3,7 +3,7 @@ import {
   FETCH_COVIDSTATS_SUCCESS,
   FETCH_COVIDSTATS_ERROR,
   TRANSLATE_COVIDSTATS_COUNTRY_NAME,
-  GET_SPECIFIC_COUNTRY_STATS
+  GET_DISPLAYED_STATS
 } from '../actions/types';
 import countriesDataPt from '../../data/countriesDataPt.json';
 
@@ -11,7 +11,7 @@ const initialState = {
   pending: false,
   COVIDStats: [],
   COVIDStatsTranslated: [],
-  CountryStats:[],
+  DisplayedStats:[],
   error: false,
 };
 
@@ -20,6 +20,8 @@ const COVIDStatsReducer = (state = initialState, action) => {
     case TRANSLATE_COVIDSTATS_COUNTRY_NAME:
       return {
         ...state,
+        pending: false,
+        error: false,
         COVIDStatsTranslated: [
           ...action.payload.map((country, index) => {
             let item={}
@@ -48,7 +50,12 @@ const COVIDStatsReducer = (state = initialState, action) => {
         ...state,
         pending: false,
         error: false,
-        COVIDStats: [...action.payload],
+        COVIDStats:action.payload,
+        DisplayedStats:{
+          ...action.payload,
+          country:'Mundo',
+          countryInfo:{flag:false}
+        }
       };
     case FETCH_COVIDSTATS_ERROR:
       return {
@@ -56,10 +63,10 @@ const COVIDStatsReducer = (state = initialState, action) => {
         pending: false,
         error: action.payload.error,
       };
-    case GET_SPECIFIC_COUNTRY_STATS:
+    case GET_DISPLAYED_STATS:
       return {
         ...state,
-        CountryStats:action.payload
+        DisplayedStats:action.payload
       }
       
     default:

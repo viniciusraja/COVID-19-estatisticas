@@ -7,26 +7,31 @@ import {
 import api from '../../../services/api';
 
 export default function fetchCOVIDStats(req) {
-  return (dispatch, getState) => {
-    dispatch(fetchCOVIDStatsPending())
-    
+  return (dispatch) => {
+    if (req === 'all') {
+      dispatch(fetchCOVIDStatsPending())
+      api
+        .get(req)
+        .then((resWolrd) => {
+          dispatch(fetchCOVIDStatsSuccess(resWolrd.data));
+        })
+        .catch((error) => {
+          dispatch(fetchCOVIDStatsError(error));
+        });
+    }else{
+      dispatch(fetchCOVIDStatsPending())
     api
-    .get(req)
-    .then((res) => {
-      dispatch(fetchCOVIDStatsTranslated(res.data))
-    })
-    .catch((error) => {
-      dispatch(fetchCOVIDStatsError(error));
-    })
+      .get(req)
+      .then((resCountry) => {
+        dispatch(fetchCOVIDStatsTranslated(resCountry.data));
+      })
+      .catch((error) => {
+        dispatch(fetchCOVIDStatsError(error));
+      });
   }
 }
-
-
- function getCOVIDStatsTranslated(req) {
-  return (dispatch, getState) => {
-    dispatch(fetchCOVIDStatsTranslated())
-  }
 }
+
 function fetchCOVIDStatsPending() {
   return {
     type: FETCH_COVIDSTATS_PENDING,
@@ -36,7 +41,7 @@ function fetchCOVIDStatsPending() {
 function fetchCOVIDStatsSuccess(COVIDStats) {
   return {
     type: FETCH_COVIDSTATS_SUCCESS,
-    payload: COVIDStats
+    payload: COVIDStats,
   };
 }
 
