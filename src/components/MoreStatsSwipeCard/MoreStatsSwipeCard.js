@@ -14,7 +14,7 @@ function GetTotalSumOfEachElementInArray(array) {
 function GetThePercentualValueFromTotal(value, total) {
   return (value / total) * 100;
 }
-function MoreStatsSwipeCard() {
+ const MoreStatsSwipeCard=(props)=> {
   const COVIDStats = useSelector((state) => state.COVIDStatsReducer.COVIDStats);
   const DisplayedStats = useSelector(
     (state) => state.COVIDStatsReducer.DisplayedStats
@@ -38,7 +38,7 @@ function MoreStatsSwipeCard() {
   );
   const translateY = new Animated.Value(0);
   let offset = 0;
-  const cardHeight = 370;
+  const cardHeight = 80;
   const animatedEvent = Animated.event(
     [
       {
@@ -58,7 +58,7 @@ function MoreStatsSwipeCard() {
 
       offset += translationY;
 
-      if ((translationY <= 100 && translationY >= 0) || translationY <= -100) {
+      if ((translationY <= 20 && translationY >= 0) || translationY <= -10) {
         opened = true;
       } else {
         translateY.setValue(offset);
@@ -105,82 +105,25 @@ function MoreStatsSwipeCard() {
             },
           ]}>
             
-          <View style={styles.countryNameAndStatsContainer}>
-            <View style={{ justifyContent:'center', alignItems:'center',width: '40%', height: 350, marginLeft:15, marginBottom:15 }}>
-            {DisplayedStats.countryInfo.flag&&<Image
-        style={[styles.countryFlagImage,{
-          transform: [
-            { rotate: '-90deg' },
-            
-          ]}]}
-        source={{
-          uri: DisplayedStats.countryInfo.flag,
-        }}
-                />}
+           
               <Text
-                style={[styles.countryNameText,{
-                  transform: [
-                    { rotate: '-90deg' },
-                    
-                  ],
-                  width: 350,
-                  height: '40%',
-                }]}>
-                  {console.log(DisplayedStats)}
-                {DisplayedStats.country}
-              </Text>
-            </View>
-            <View style={styles.allStatsContainer}>
-              <Animated.Text
                 style={[
                   styles.moreStatsTitle,
-                  {
-                    opacity: translateY.interpolate({
-                      inputRange: [-10, 0],
-                      outputRange: [0, 1],
-                    }),
-                  },
+                  
                 ]}>
-                + DADOS
-              </Animated.Text>
-              <Animated.View
+                  
+                {props.statsName}
+              </Text>
+             
+              <Text
                 style={[
-                  styles.confirmedCasesContainer,
-                  {
-                    opacity: translateY.interpolate({
-                      inputRange: [-cardHeight, 0],
-                      outputRange: [1, 0],
-                    }),
-                  },
-                  widthConfirmedCasesContainer < 15 ? { flex: 0 } : { flex: 1 },
+                  styles.casesNumber,
+                  
                 ]}>
-                <Text style={styles.confirmedCasesTitle}>CONFIRMADOS</Text>
-                <Text style={styles.confirmedCasesNumber}>
-                  {DisplayedStats.cases}
-                </Text>
-              </Animated.View>
-              <View
-                style={[
-                  styles.testedCasesContainer,
-                  widthTestedCasesContainer < 15 ? { flex: 0 } : { flex: 1 },
-                ]}>
-                <Text style={styles.testedCasesTitle}>TESTES</Text>
-                <Text style={styles.testedCasesNumber}>
-                  {DisplayedStats.tests}
-                </Text>
-              </View>
-              <View
-                style={[
-                  styles.deathsCasesContainer,
-                  widthDeathsCasesContainer < 15 ? { flex: 0 } : { flex: 1 },
-                ]}>
-                <Text style={styles.deathsCasesTitle}>MORTES</Text>
-                <Text style={styles.deathsCasesNumber}>
-                  {DisplayedStats.deaths}
-                </Text>
-              </View>
-            </View>
-          </View>
+                  
+                {props.stats}
+              </Text>
+             
         </Animated.View>
       </PanGestureHandler>
     </View>

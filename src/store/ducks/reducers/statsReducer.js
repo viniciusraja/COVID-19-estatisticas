@@ -11,7 +11,9 @@ const initialState = {
   pending: false,
   COVIDStats: [],
   COVIDStatsTranslated: [],
-  DisplayedStats:[],
+  DisplayedStats:{
+    countryInfo:{flag:false}
+  },
   error: false,
 };
 

@@ -19,7 +19,6 @@ import MoreStatsSwipeCard from '../components/MoreStatsSwipeCard';
 import fetchCOVIDStats from '../store/ducks/actions/covidStats';
 import getDisplayedStats from '../store/ducks/actions/displayedStats';
 import Constants from '../config/constants/Constants';
-import COVIDStatsReducer from '../store/ducks/reducers/statsReducer';
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -49,10 +48,8 @@ class HomeScreen extends Component {
     if (query === '') {
       return [];
     }
-    
     const {allCountriesStats} = this.state;
     const regex = new RegExp(`${query.trim()}`, 'i');
-    
     return allCountriesStats.filter(
       (country) => {
         return country.country.search(regex) >= 0}
@@ -79,7 +76,6 @@ class HomeScreen extends Component {
               Houve error {console.log(error)}
             </Text>
           )}
-{console.log(this.props.DisplayedStats)}
           <View style={styles.logoAndInputAndRecoveredContainer}>
             <LogoSvg style={styles.logo} />
             <View style={styles.autoCompleteContainerToFixPosition}>
@@ -120,7 +116,7 @@ class HomeScreen extends Component {
         }}
       />
                   <Text style={styles.inputSearchCountryText}>
-                    {item.country}{console.log(item.countryInfo)}
+                    {item.country}
                   </Text>
                     </View>
                 </TouchableOpacity>}
@@ -136,8 +132,16 @@ class HomeScreen extends Component {
               </Text>
             </View>
           </View>
+         <View style={styles.worldMapContainer}>
+            <Image
+        style={styles.worldMapImage}
+        source={require('../assets/images/mundo.png')}
+        />
+        </View>
           <View style={styles.moreStatsContainer}>
-            <MoreStatsSwipeCard />
+            <MoreStatsSwipeCard stats={this.props.DisplayedStats.deaths} statsName={"MORTES"}/>
+            <MoreStatsSwipeCard stats={this.props.DisplayedStats.cases} statsName={"CASOS"}/>
+            <MoreStatsSwipeCard stats={this.props.DisplayedStats.tests} statsName={"TESTES"}/>
           </View>
         </View>
       </LinearGradient>
@@ -198,7 +202,7 @@ const styles = StyleSheet.create({
   },
   inputSearchCountryItemContainer:{
     flexDirection:'row',
-    justifyContent:'center',
+    justifyContent:'flex-start',
     alignItems:'center',
     height:25,
     backgroundColor: '#F5F5F5',
@@ -210,6 +214,7 @@ const styles = StyleSheet.create({
     width:30,
     borderRadius:7,
     marginRight:20,
+    marginLeft:10
   },
   inputSearchCountryText: {
     fontFamily: 'big_noodle_titling_oblique',
@@ -224,6 +229,9 @@ const styles = StyleSheet.create({
     fontFamily: 'big_noodle_titling',
     fontSize: 50,
     color: Constants.Colors.green,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 5,
   },
   recoveredNumber: {
     position: 'relative',
@@ -234,10 +242,36 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
+    zIndex:10,
+  },
+  worldMapContainer:{
+    justifyContent:'center',
+    alignItems:'center',
+    height:200,
+    width:200,
+    borderWidth:7,
+    borderColor:'#FFF',
+    borderRadius:200,
+    alignSelf:'flex-start',
+    left:-100,
+    bottom:150,
+    zIndex:2
+  },
+  worldMapImage:{
+    resizeMode:'contain',
+    width:'100%',
+    height:'100%',
+    zIndex:0,
   },
   moreStatsContainer: {
+    position:'absolute',
+    flexDirection:'row',
+    bottom:0,
     height: 30,
     width: '100%',
+    elevation:10,
+    zIndex:40,
+
   },
 });
 
