@@ -33,26 +33,28 @@ class HomeScreen extends Component {
   }
   componentDidMount= async ()=>{
     await this.props.fetchCOVIDStats('all')
-     await this.props.fetchCOVIDStats('countries/')
+    await this.props.fetchCOVIDStats('countries/')
+  }
+  
+  shouldComponentRender() {
+    const { pending } = this.props;
+    if (pending === false) {
+      return false;
     }
-    
-      shouldComponentRender() {
-        const { pending } = this.props;
-        if (pending === false) {
-          return false;
-      }
-      return true;
-    }
-    
-    findFilm(query) {
+    return true;
+  }
+
+     findFilm(query) {
     if (query === '') {
       return [];
     }
+    query=query.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     const {allCountriesStats} = this.state;
-    const regex = new RegExp(`${query.trim()}`, 'i');
+    const regex = new RegExp(`^${query.trim()}`, 'i');
+    
     return allCountriesStats.filter(
       (country) => {
-        return country.country.search(regex) >= 0}
+        return country.country.normalize("NFD").replace(/[\u0300-\u036f]/g, "").search(regex) >= 0}
       );
     }
     
@@ -62,7 +64,17 @@ class HomeScreen extends Component {
     const countries = this.findFilm(query);
     const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
 
-    if (this.shouldComponentRender()) return <ActivityIndicator />;
+    if (this.shouldComponentRender()) 
+    return( 
+    <LinearGradient
+        colors={['#fff', '#f5f5f5', '#B7FDF0']}
+        start={[0, 0]}
+        end={[0, 0.5]}
+        style={{ flex: 1 , justifyContent:"center", alignItems:"center"}}>
+        
+        <LogoSvg style={[styles.logo,{position:'absolute', top:100}]} />
+          <ActivityIndicator size={60} color={Constants.Colors.darkGreen} />
+          </LinearGradient>)
 
     return (
       <LinearGradient
@@ -72,9 +84,11 @@ class HomeScreen extends Component {
         style={{ flex: 1 }}>
         <View style={styles.container}>
           {error && (
-            <Text className="product-list-error">
-              Houve error {console.log(error)}
+            <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>
+              {`SENTIMOS MUITO HOUVE UM ERRO.\n REINICIE O APP`}
             </Text>
+            </View>
           )}
           <View style={styles.logoAndInputAndRecoveredContainer}>
             <LogoSvg style={styles.logo} />
@@ -98,10 +112,10 @@ class HomeScreen extends Component {
               defaultValue={query}
               onChangeText={(text) => this.setState({ query: text })}
               keyExtractor={(item) => `${item.countryInfo._id}`}
-              placeholder="Enter Star Wars country title"
+              placeholder="PESQUISE O PAÌS"
               renderItem={({ item, index }) => {
-                if(index<5){
-                return <TouchableOpacity
+                if(index<2){
+                  return <TouchableOpacity
                   onPress={() =>{
                     this.setState({ query: item.country}),
                     this.props.getDisplayedStats(item),
@@ -138,10 +152,15 @@ class HomeScreen extends Component {
         source={require('../assets/images/mundo.png')}
         />
         </View>
-          <View style={styles.moreStatsContainer}>
-            <MoreStatsSwipeCard stats={this.props.DisplayedStats.deaths} statsName={"MORTES"}/>
-            <MoreStatsSwipeCard stats={this.props.DisplayedStats.cases} statsName={"CASOS"}/>
-            <MoreStatsSwipeCard stats={this.props.DisplayedStats.tests} statsName={"TESTES"}/>
+          <View style={styles.moreStatsSuperiorContainer}>
+            <MoreStatsSwipeCard stats={this.props.DisplayedStats.cases} statsName={"CASOS"} color={Constants.Colors.darkGreen}/>
+            <MoreStatsSwipeCard stats={this.props.DisplayedStats.tests} statsName={"TESTES"} color={Constants.Colors.darkGreen}/>
+            <MoreStatsSwipeCard stats={this.props.DisplayedStats.deaths} statsName={"MORTES"} color={Constants.Colors.darkGreen}/>
+          </View>
+          <View style={styles.moreStatsInferiorContainer}>
+            <MoreStatsSwipeCard stats={this.props.DisplayedStats.todayCases} statsName={"CASOS HOJE"} color={Constants.Colors.lightGreen}/>
+            <MoreStatsSwipeCard stats={this.props.DisplayedStats.critical} statsName={"CRÍTICOS"} color={Constants.Colors.lightGreen}/>
+            <MoreStatsSwipeCard stats={this.props.DisplayedStats.todayDeaths} statsName={"MORTES HOJE"} color={Constants.Colors.lightGreen}/>
           </View>
         </View>
       </LinearGradient>
@@ -155,6 +174,25 @@ const styles = StyleSheet.create({
     width:"100%",
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  errorContainer:{
+    position:'absolute',
+    top:'50%',
+    justifyContent:'center',
+    width:320,
+    height:60,
+    backgroundColor:'#F5F5F5',
+    borderRadius:20,
+    zIndex:60,
+    elevation:30
+
+    
+  },
+  errorText:{
+    textAlign:'center',
+    fontFamily: Constants.fontFamily,
+    fontSize:20,
+    color:'red'
   },
   autoCompleteContainerToFixPosition: {
     position:'absolute',
@@ -204,14 +242,14 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     justifyContent:'flex-start',
     alignItems:'center',
-    height:25,
+    height:60,
     backgroundColor: '#F5F5F5',
     borderRadius:20,
     marginVertical:2,
   },
   inputSearchCountryFlagImage:{
-    height:20,
-    width:30,
+    height:25,
+    width:35,
     borderRadius:7,
     marginRight:20,
     marginLeft:10
@@ -263,7 +301,17 @@ const styles = StyleSheet.create({
     height:'100%',
     zIndex:0,
   },
-  moreStatsContainer: {
+  moreStatsSuperiorContainer: {
+    position:'absolute',
+    flexDirection:'row',
+    bottom:30,
+    height: 30,
+    width: '100%',
+    elevation:10,
+    zIndex:40,
+
+  },
+  moreStatsInferiorContainer:{
     position:'absolute',
     flexDirection:'row',
     bottom:0,
