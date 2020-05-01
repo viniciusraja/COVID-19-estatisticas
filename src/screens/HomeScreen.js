@@ -8,8 +8,12 @@ import {
   TextInput,
   TouchableOpacity,
   Keyboard,
-  Image
+  Image,
+  Linking
 } from 'react-native';
+import {
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { connect } from 'react-redux';
 import Autocomplete from 'react-native-autocomplete-input';
 
@@ -42,6 +46,10 @@ class HomeScreen extends Component {
       return false;
     }
     return true;
+  }
+
+  shareToEmail = () => {
+    Linking.openURL(`mailto:covid-19estatistica@outlook.com?subject=&body=`);
   }
 
      findFilm(query) {
@@ -91,6 +99,17 @@ class HomeScreen extends Component {
             </View>
           )}
           <View style={styles.logoAndInputAndRecoveredContainer}>
+            <View style={styles.sendEmailContainer}>
+              <TouchableOpacity style={styles.sendEmailButton}
+              onPress={() => this.shareToEmail()}>
+              <MaterialCommunityIcons
+                  style={styles.sendEmailIcon}
+                  name="email-outline"
+                  size={32}
+                  color="#fff"
+                />
+              </TouchableOpacity>
+            </View>
             <LogoSvg style={styles.logo} />
             <View style={styles.autoCompleteContainerToFixPosition}>
             <Autocomplete
@@ -198,6 +217,28 @@ const styles = StyleSheet.create({
     position:'absolute',
     top:115,
     zIndex:30,
+  },
+  sendEmailContainer:{
+    position:'absolute',
+    right:0,
+    height:40,
+    width:45,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:Constants.Colors.darkGreen,
+    borderWidth:.7,
+    borderColor:Constants.Colors.lightGreen,
+    borderTopLeftRadius:7,
+    borderBottomLeftRadius:7,
+    elevation:10,
+    
+
+  },
+  sendEmailIcon:{
+    textShadowColor: 'rgba(50, 50, 50, 0.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 5,
+
   },
   logoAndInputAndRecoveredContainer: {
     width: '100%',
