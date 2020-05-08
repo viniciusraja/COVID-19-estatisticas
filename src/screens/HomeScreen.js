@@ -9,16 +9,13 @@ import {
   TouchableOpacity,
   Keyboard,
   Image,
-  Linking
+  Linking,
 } from 'react-native';
-import {
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import Autocomplete from 'react-native-autocomplete-input';
 
-import countriesDataPt from '../store/data/countriesDataPt.json'
-import LogoSvg from '../components/LogoSvg/logoSvg';
+import countriesDataPt from '../store/data/countriesDataPt.json';
 import MoreStatsSwipeCard from '../components/MoreStatsSwipeCard';
 import fetchCOVIDStats from '../store/ducks/actions/covidStats';
 import getDisplayedStats from '../store/ducks/actions/displayedStats';
@@ -28,18 +25,17 @@ class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      stats:'',
-      allCountriesStats: [this.props.COVIDStatsTranslated ],
+      allCountriesStats: [this.props.COVIDStatsTranslated],
       query: '',
-      countriesDataPt:[...countriesDataPt]
+      countriesDataPt: [...countriesDataPt],
     };
     this.shouldComponentRender = this.shouldComponentRender.bind(this);
   }
-  componentDidMount= async ()=>{
-    await this.props.fetchCOVIDStats('all')
-    await this.props.fetchCOVIDStats('countries/')
-  }
-  
+  componentDidMount = async () => {
+    await this.props.fetchCOVIDStats('all');
+    await this.props.fetchCOVIDStats('countries/');
+  };
+
   shouldComponentRender() {
     const { pending } = this.props;
     if (pending === false) {
@@ -50,39 +46,46 @@ class HomeScreen extends Component {
 
   shareToEmail = () => {
     Linking.openURL(`mailto:covid-19estatistica@outlook.com?subject=&body=`);
-  }
+  };
 
-     findFilm(query) {
+  findCountry(query) {
     if (query === '') {
       return [];
     }
-    query=query.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    const {allCountriesStats} = this.state;
+    query = query.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const { allCountriesStats } = this.state;
     const regex = new RegExp(`^${query.trim()}`, 'i');
-    
-    return allCountriesStats.filter(
-      (country) => {
-        return country.country.normalize("NFD").replace(/[\u0300-\u036f]/g, "").search(regex) >= 0}
+
+    return allCountriesStats.filter((country) => {
+      return (
+        country.country
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .search(regex) >= 0
       );
-    }
-    
-    render() {
-      const { COVIDStats, error, pending } = this.props;
-      const { query } = this.state;
-    const countries = this.findFilm(query);
+    });
+  }
+
+  render() {
+    const { COVIDStats, error, pending } = this.props;
+    const { query } = this.state;
+    const countries = this.findCountry(query);
     const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
 
-    if (this.shouldComponentRender()) 
-    return( 
-    <LinearGradient
-        colors={['#fff', '#f5f5f5', '#B7FDF0']}
-        start={[0, 0]}
-        end={[0, 0.5]}
-        style={{ flex: 1 , justifyContent:"center", alignItems:"center"}}>
-        
-        <LogoSvg style={[styles.logo,{position:'absolute', top:100}]} />
+    if (this.shouldComponentRender())
+      return (
+        <LinearGradient
+          colors={['#fff', '#f5f5f5', '#B7FDF0']}
+          start={[0, 0]}
+          end={[0, 0.5]}
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Image
+            style={styles.logoImage}
+            source={require('../assets/images/Logo.png')}
+          />
           <ActivityIndicator size={60} color={Constants.Colors.darkGreen} />
-          </LinearGradient>)
+        </LinearGradient>
+      );
 
     return (
       <LinearGradient
@@ -93,16 +96,17 @@ class HomeScreen extends Component {
         <View style={styles.container}>
           {error && (
             <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>
-              {`SENTIMOS MUITO HOUVE UM ERRO.\n REINICIE O APP`}
-            </Text>
+              <Text style={styles.errorText}>
+                {`SENTIMOS MUITO HOUVE UM ERRO.\n REINICIE O APP`}
+              </Text>
             </View>
           )}
           <View style={styles.logoAndInputAndRecoveredContainer}>
             <View style={styles.sendEmailContainer}>
-              <TouchableOpacity style={styles.sendEmailButton}
-              onPress={() => this.shareToEmail()}>
-              <MaterialCommunityIcons
+              <TouchableOpacity
+                style={styles.sendEmailButton}
+                onPress={() => this.shareToEmail()}>
+                <MaterialCommunityIcons
                   style={styles.sendEmailIcon}
                   name="email-outline"
                   size={32}
@@ -110,76 +114,108 @@ class HomeScreen extends Component {
                 />
               </TouchableOpacity>
             </View>
-            <LogoSvg style={styles.logo} />
+            <Image
+              style={styles.logoImage}
+              source={require('../assets/images/Logo.png')}
+            />
             <View style={styles.autoCompleteContainerToFixPosition}>
-            <Autocomplete
-              onPress={()=>this.myTextInput.current.clear()}
-              onTouchEnd={()=>this.setState({ allCountriesStats:this.props.COVIDStatsTranslated })}
-              style={styles.inputSearchCountryContainer}
-              autoCapitalize="none"
-              autoCorrect={false}
-              clearButtonMode="always"
-              inputContainerStyle={styles.inputContainerStyle}
-              containerStyle={styles.containerStyle}
-              listContainerStyle={styles.listContainerStyle}
-              listStyle={styles.listStyle}
-              data={
-                countries.length === 1 && comp(query, countries[0].country)
-                  ? []
-                  : countries
-              }
-              defaultValue={query}
-              onChangeText={(text) => this.setState({ query: text })}
-              keyExtractor={(item) => `${item.countryInfo._id}`}
-              placeholder="PESQUISE O PAÌS"
-              renderItem={({ item, index }) => {
-                if(index<2){
-                  return <TouchableOpacity
-                  onPress={() =>{
-                    this.setState({ query: item.country}),
-                    this.props.getDisplayedStats(item),
-                    Keyboard.dismiss()
+              <Autocomplete
+                onPress={() => this.myTextInput.current.clear()}
+                onTouchEnd={() =>
+                  this.setState({
+                    allCountriesStats: this.props.COVIDStatsTranslated,
+                  })
+                }
+                style={styles.inputSearchCountryContainer}
+                autoCapitalize="none"
+                autoCorrect={false}
+                clearButtonMode="always"
+                inputContainerStyle={styles.inputContainerStyle}
+                containerStyle={styles.containerStyle}
+                listContainerStyle={styles.listContainerStyle}
+                listStyle={styles.listStyle}
+                data={
+                  countries.length === 1 && comp(query, countries[0].country)
+                    ? []
+                    : countries
+                }
+                defaultValue={query}
+                onChangeText={(text) => this.setState({ query: text })}
+                keyExtractor={(item) => `${item.countryInfo._id}`}
+                placeholder="PESQUISE O PAÌS"
+                renderItem={({ item, index }) => {
+                  if (index < 2) {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => {
+                          this.setState({ query: item.country }),
+                            this.props.getDisplayedStats(item),
+                            Keyboard.dismiss();
+                        }}>
+                        <View style={styles.inputSearchCountryItemContainer}>
+                          <Image
+                            style={styles.inputSearchCountryFlagImage}
+                            source={{
+                              uri: item.countryInfo.flag,
+                            }}
+                          />
+                          <Text style={styles.inputSearchCountryText}>
+                            {item.country}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
                   }
-                  }>
-                    <View style={styles.inputSearchCountryItemContainer}>
-                    <Image
-        style={styles.inputSearchCountryFlagImage}
-        source={{
-          uri: item.countryInfo.flag,
-        }}
-      />
-                  <Text style={styles.inputSearchCountryText}>
-                    {item.country}
-                  </Text>
-                    </View>
-                </TouchableOpacity>}
-                return null
-              }}
-            /></View>
-            <View
-              style={styles.recoveredContainer}
-              >
+                  return null;
+                }}
+              />
+            </View>
+            <View style={styles.worldMapContainer}>
+              <Image
+                style={styles.worldMapImage}
+                source={require('../assets/images/mundo.png')}
+              />
+            </View>
+            <View style={styles.recoveredContainer}>
               <Text style={styles.recoveredTitle}>CURADOS</Text>
               <Text style={styles.recoveredNumber}>
                 {this.props.DisplayedStats.recovered}
               </Text>
             </View>
           </View>
-         <View style={styles.worldMapContainer}>
-            <Image
-        style={styles.worldMapImage}
-        source={require('../assets/images/mundo.png')}
-        />
-        </View>
           <View style={styles.moreStatsSuperiorContainer}>
-            <MoreStatsSwipeCard stats={this.props.DisplayedStats.cases} statsName={"CASOS"} color={Constants.Colors.darkGreen}/>
-            <MoreStatsSwipeCard stats={this.props.DisplayedStats.tests} statsName={"TESTES"} color={Constants.Colors.darkGreen}/>
-            <MoreStatsSwipeCard stats={this.props.DisplayedStats.deaths} statsName={"MORTES"} color={Constants.Colors.darkGreen}/>
+            <MoreStatsSwipeCard
+              stats={this.props.DisplayedStats.cases}
+              statsName={'CASOS'}
+              color={Constants.Colors.darkGreen}
+            />
+            <MoreStatsSwipeCard
+              stats={this.props.DisplayedStats.tests}
+              statsName={'TESTES'}
+              color={Constants.Colors.darkGreen}
+            />
+            <MoreStatsSwipeCard
+              stats={this.props.DisplayedStats.deaths}
+              statsName={'MORTES'}
+              color={Constants.Colors.darkGreen}
+            />
           </View>
           <View style={styles.moreStatsInferiorContainer}>
-            <MoreStatsSwipeCard stats={this.props.DisplayedStats.todayCases} statsName={"CASOS HOJE"} color={Constants.Colors.lightGreen}/>
-            <MoreStatsSwipeCard stats={this.props.DisplayedStats.critical} statsName={"CRÍTICOS"} color={Constants.Colors.lightGreen}/>
-            <MoreStatsSwipeCard stats={this.props.DisplayedStats.todayDeaths} statsName={"MORTES HOJE"} color={Constants.Colors.lightGreen}/>
+            <MoreStatsSwipeCard
+              stats={this.props.DisplayedStats.todayCases}
+              statsName={'CASOS HOJE'}
+              color={Constants.Colors.lightGreen}
+            />
+            <MoreStatsSwipeCard
+              stats={this.props.DisplayedStats.critical}
+              statsName={'CRÍTICOS'}
+              color={Constants.Colors.lightGreen}
+            />
+            <MoreStatsSwipeCard
+              stats={this.props.DisplayedStats.todayDeaths}
+              statsName={'MORTES HOJE'}
+              color={Constants.Colors.lightGreen}
+            />
           </View>
         </View>
       </LinearGradient>
@@ -190,110 +226,108 @@ class HomeScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width:"100%",
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  errorContainer:{
-    position:'absolute',
-    top:'50%',
-    justifyContent:'center',
-    width:320,
-    height:60,
-    backgroundColor:'#F5F5F5',
-    borderRadius:20,
-    zIndex:60,
-    elevation:30
-
-    
+  errorContainer: {
+    position: 'absolute',
+    top: '50%',
+    justifyContent: 'center',
+    width: 320,
+    height: 60,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 20,
+    zIndex: 60,
+    elevation: 30,
   },
-  errorText:{
-    textAlign:'center',
+  errorText: {
+    textAlign: 'center',
     fontFamily: Constants.fontFamily,
-    fontSize:20,
-    color:'red'
+    fontSize: 20,
+    color: 'red',
   },
   autoCompleteContainerToFixPosition: {
-    position:'absolute',
-    top:115,
-    zIndex:30,
+    position: 'absolute',
+    top: 115,
+    zIndex: 30,
   },
-  sendEmailContainer:{
-    position:'absolute',
-    right:0,
-    height:40,
-    width:45,
-    justifyContent:'center',
-    alignItems:'center',
-    backgroundColor:Constants.Colors.darkGreen,
-    borderWidth:.7,
-    borderColor:Constants.Colors.lightGreen,
-    borderTopLeftRadius:7,
-    borderBottomLeftRadius:7,
-    elevation:10,
-    
-
+  sendEmailContainer: {
+    position: 'absolute',
+    right: 0,
+    height: 40,
+    width: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Constants.Colors.darkGreen,
+    borderWidth: 0.7,
+    borderColor: Constants.Colors.lightGreen,
+    borderTopLeftRadius: 7,
+    borderBottomLeftRadius: 7,
+    elevation: 10,
   },
-  sendEmailIcon:{
+  sendEmailIcon: {
     textShadowColor: 'rgba(50, 50, 50, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 5,
-
+  },
+  logoImage: {
+    height: 95,
+    resizeMode: 'contain',
   },
   logoAndInputAndRecoveredContainer: {
     width: '100%',
-    marginTop:50,
-    height:370,
+    marginTop: 50,
+    height: 370,
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   inputSearchCountryContainer: {
     height: 30,
-    width:'100%',
+    width: '100%',
     borderRadius: 20,
     backgroundColor: '#F5F5F5',
     elevation: 7,
     fontFamily: Constants.fontFamily,
-    fontSize:17,
-    textAlign:'center',
+    fontSize: 17,
+    textAlign: 'center',
   },
-  inputContainerStyle:{
-    marginTop:10,
+  inputContainerStyle: {
+    marginTop: 10,
     height: 29,
-    width:280,
-    borderWidth:0,
+    width: 280,
+    borderWidth: 0,
     borderRadius: 20,
+  },
+  containerStyle: {
     
   },
-  containerStyle:{
-  },
-  listContainerStyle:{
+  listContainerStyle: {
     justifyContent:'center',
     alignItems:'center',
-    
   },
-  listStyle:{
-    height:200,
+  listStyle: {
+    height: 200,
     backgroundColor: 'transparent',
-    borderWidth:0,
-    marginTop:2,
-    width:'100%',
+    borderWidth: 0,
+    marginTop: 2,
+    width: '100%',
   },
-  inputSearchCountryItemContainer:{
-    flexDirection:'row',
-    justifyContent:'flex-start',
-    alignItems:'center',
-    height:60,
+  inputSearchCountryItemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    height: 60,
     backgroundColor: '#F5F5F5',
-    borderRadius:20,
-    marginVertical:2,
+    borderRadius: 20,
+    marginVertical: 2,
   },
-  inputSearchCountryFlagImage:{
-    height:25,
-    width:35,
-    borderRadius:7,
-    marginRight:20,
-    marginLeft:10
+  inputSearchCountryFlagImage: {
+    height: 25,
+    width: 35,
+    borderRadius: 7,
+    marginRight: 20,
+    marginLeft: 10,
   },
   inputSearchCountryText: {
     fontFamily: 'big_noodle_titling_oblique',
@@ -301,6 +335,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   recoveredContainer: {
+    bottom: 100,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -316,51 +351,48 @@ const styles = StyleSheet.create({
     position: 'relative',
     bottom: 25,
     fontFamily: 'big_noodle_titling',
-    fontSize: 120,
+    fontSize: 110,
     color: '#FFF',
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
-    zIndex:10,
+    zIndex: 10,
   },
-  worldMapContainer:{
-    justifyContent:'center',
-    alignItems:'center',
-    height:200,
-    width:200,
-    borderWidth:7,
-    borderColor:'#FFF',
-    borderRadius:200,
-    alignSelf:'flex-start',
-    left:-100,
-    bottom:150,
-    zIndex:2
+  worldMapContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 200,
+    width: 200,
+    borderWidth: 7,
+    borderColor: '#FFF',
+    borderRadius: 200,
+    alignSelf: 'flex-start',
+    left: -100,
+    top: 100,
   },
-  worldMapImage:{
-    resizeMode:'contain',
-    width:'100%',
-    height:'100%',
-    zIndex:0,
+  worldMapImage: {
+    resizeMode: 'contain',
+    width: '100%',
+    height: '100%',
+    zIndex: 0,
   },
   moreStatsSuperiorContainer: {
-    position:'absolute',
-    flexDirection:'row',
-    bottom:30,
+    position: 'absolute',
+    flexDirection: 'row',
+    bottom: 30,
     height: 30,
     width: '100%',
-    elevation:10,
-    zIndex:40,
-
+    elevation: 10,
+    zIndex: 40,
   },
-  moreStatsInferiorContainer:{
-    position:'absolute',
-    flexDirection:'row',
-    bottom:0,
+  moreStatsInferiorContainer: {
+    position: 'absolute',
+    flexDirection: 'row',
+    bottom: 0,
     height: 30,
     width: '100%',
-    elevation:10,
-    zIndex:40,
-
+    elevation: 10,
+    zIndex: 40,
   },
 });
 
@@ -372,11 +404,11 @@ const mapStateToProps = (state) => ({
   pending: state.COVIDStatsReducer.pending,
 });
 
-const mapDispatchToProps = (dispatch) =>{
+const mapDispatchToProps = (dispatch) => {
   return {
-    fetchCOVIDStats: req => dispatch(fetchCOVIDStats(req)),
-    getDisplayedStats: stats => dispatch(getDisplayedStats(stats))
-  }
-  }
+    fetchCOVIDStats: (req) => dispatch(fetchCOVIDStats(req)),
+    getDisplayedStats: (stats) => dispatch(getDisplayedStats(stats)),
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

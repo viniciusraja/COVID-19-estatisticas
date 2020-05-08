@@ -1,40 +1,10 @@
 import React from 'react';
-import { View, Animated, Text, Image } from 'react-native';
+import { View, Animated, Text } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+
 import { styles } from './styles';
 
-import { useSelector } from 'react-redux';
-
-function GetTotalSumOfEachElementInArray(array) {
-  return array.reduce(
-    (accumulator, currentValue) => accumulator + currentValue
-  );
-}
-function GetThePercentualValueFromTotal(value, total) {
-  return (value / total) * 100;
-}
 const MoreStatsSwipeCard = (props) => {
-  const COVIDStats = useSelector((state) => state.COVIDStatsReducer.COVIDStats);
-  const DisplayedStats = useSelector(
-    (state) => state.COVIDStatsReducer.DisplayedStats
-  );
-  const totalStatsNumberFromMoreStats = GetTotalSumOfEachElementInArray([
-    DisplayedStats.cases,
-    DisplayedStats.tests,
-    DisplayedStats.deaths,
-  ]);
-  const widthConfirmedCasesContainer = GetThePercentualValueFromTotal(
-    DisplayedStats.cases,
-    totalStatsNumberFromMoreStats
-  );
-  const widthTestedCasesContainer = GetThePercentualValueFromTotal(
-    DisplayedStats.tests,
-    totalStatsNumberFromMoreStats
-  );
-  const widthDeathsCasesContainer = GetThePercentualValueFromTotal(
-    DisplayedStats.deaths,
-    totalStatsNumberFromMoreStats
-  );
   const translateY = new Animated.Value(0);
   let offset = 0;
   const cardHeight = 50;
@@ -65,11 +35,11 @@ const MoreStatsSwipeCard = (props) => {
       }
 
       Animated.timing(translateY, {
-        toValue: opened ? -(cardHeight) : 0,
+        toValue: opened ? -cardHeight : 0,
         duration: 300,
         useNativeDriver: true,
       }).start(() => {
-        offset = opened ? -(cardHeight) : 0;
+        offset = opened ? -cardHeight : 0;
         translateY.setOffset(offset);
         translateY.setValue(0);
       });
@@ -82,14 +52,15 @@ const MoreStatsSwipeCard = (props) => {
         onGestureEvent={animatedEvent}
         onHandlerStateChange={onHandlerStateChanged}>
         <Animated.View
-          style={[{backgroundColor:props.color},
+          style={[
+            { backgroundColor: props.color },
             styles.moreStatsContainer,
             {
               transform: [
                 {
                   translateY: translateY.interpolate({
-                    inputRange: [-(cardHeight), 0, 200],
-                    outputRange: [-(cardHeight), 0, 10],
+                    inputRange: [-cardHeight, 0, 200],
+                    outputRange: [-cardHeight, 0, 10],
                     extrapolate: 'clamp',
                   }),
                 },
