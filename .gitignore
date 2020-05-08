@@ -10,5 +10,9 @@ npm-debug.*
 web-build/
 web-report/
 
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+GoogleService-Info.plist
+
 # macOS
 .DS_Store

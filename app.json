@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "CURA COVID-19",
-    "slug": "curacovid-19",
+    "name": "COVID-19 Estatísticas",
+    "slug": "covid-19",
     "platforms": [
       "ios",
       "android",
@@ -9,12 +9,12 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/images/splash.png",
+    "icon": "./src/assets/images/icon.png",
     "scheme": "myapp",
     "splash": {
       "image": "./src/assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#317065"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -23,7 +23,15 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "covid19.estatistica",
+      "buildNumber": "1.0.0",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true
+    },
+    "android": {
+      "package": "covid19.estatistica",
+      "versionCode": 1,
+      "googleServicesFile": "./google-services.json"
     }
   }
 }
